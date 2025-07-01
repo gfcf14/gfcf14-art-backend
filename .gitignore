@@ -1,0 +1,30 @@
+# Build artifacts
+bin/
+obj/
+artifacts/
+out/
+TestResults/
+publish/
+
+# User-specific
+*.user
+*.suo
+*.cache
+*.sln.docstates
+
+# Secrets & config
+.env
+appsettings.Development.json
+appsettings.Production.json
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
