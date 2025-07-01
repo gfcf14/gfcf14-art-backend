@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: gfcf14-art-backend
+    env: docker
+    plan: free
+    autoDeploy: true
