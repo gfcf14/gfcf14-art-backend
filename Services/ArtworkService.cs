@@ -15,7 +15,9 @@ public class ArtworkService
 
   public async Task<List<Artwork>> GetAllAsync()
   {
-    return await _context.Artworks.ToListAsync();
+    return await _context.Artworks
+      .OrderByDescending(a => a.Date)
+      .ToListAsync();
   }
 
   public async Task<Artwork?> GetByDateAsync(string date)
