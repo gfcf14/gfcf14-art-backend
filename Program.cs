@@ -14,6 +14,16 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Enables CORS for the url of the deployed/local frontend instance
+var frontendOrigin = builder.Configuration["AppSettings:FRONT_END_ORIGIN"]!;
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins(frontendOrigin).AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -22,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("FrontendPolicy");
 
 app.UseHttpsRedirection();
 app.MapControllers();
