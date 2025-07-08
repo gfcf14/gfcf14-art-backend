@@ -28,7 +28,7 @@ public class ArtworkController : ControllerBase
   [HttpGet("{date}")]
   public async Task<ActionResult<Artwork>> GetByDate(string date)
   {
-    var artwork = await _service.GetByDateAsync(date);
+    var artwork = await _service.GetClosestOrEarliestAsync(date);
     if (artwork == null)
     {
       return NotFound();
