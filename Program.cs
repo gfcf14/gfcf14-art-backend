@@ -1,11 +1,15 @@
 using gfcf14_art_backend.Data;
 using gfcf14_art_backend.Services;
+using gfcf14_art_backend.Utils;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<ArtworkService>();
+builder.Services.AddScoped<UserService>();
+
+builder.Services.AddSingleton<JwtUtil>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration["AppSettings:DB_URL"]));
 

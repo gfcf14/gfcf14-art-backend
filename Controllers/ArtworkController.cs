@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using gfcf14_art_backend.Models;
 using gfcf14_art_backend.Services;
+using gfcf14_art_backend.Utils;
 
 namespace gfcf14_art_backend.Controllers;
 
@@ -9,10 +10,12 @@ namespace gfcf14_art_backend.Controllers;
 public class ArtworkController : ControllerBase
 {
   private readonly ArtworkService _service;
+  private readonly JwtUtil _jwtUtil;
 
-  public ArtworkController(ArtworkService service)
+  public ArtworkController(ArtworkService service, JwtUtil jwtUtil)
   {
     _service = service;
+    _jwtUtil = jwtUtil;
   }
 
   [HttpGet]
@@ -37,7 +40,21 @@ public class ArtworkController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<Artwork>> Create([FromBody] Artwork artwork)
   {
+    var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+    {
+      return Unauthorized("Missing or invalid token format");
+    }
+
+    var token = authHeader.Substring("Bearer ".Length).Trim();
+
+    if (!_jwtUtil.IsTokenValid(token) || !_jwtUtil.CanPost(token))
+    {
+      return Forbid("Invalid or expired token");
+    }
+
     var created = await _service.CreateArtworkAsync(artwork);
-    return Ok(created);
+    return Ok(new { message = $"Artwork {artwork.Title} successfully created" });
   }
 }
