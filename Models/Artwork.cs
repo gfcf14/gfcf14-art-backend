@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace gfcf14_art_backend.Models;
 
@@ -30,6 +32,8 @@ public class Link
   [Column("url")]
   public string Url { get; set; } = default!;
 
-  // for db context navigation
-  public Artwork Artwork { get; set; } = default!;
+  // for db context navigation (optional when creating)
+  [JsonIgnore]
+  [ValidateNever]
+  public Artwork? Artwork { get; set; } = default!;
 }

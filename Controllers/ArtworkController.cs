@@ -11,11 +11,13 @@ public class ArtworkController : ControllerBase
 {
   private readonly ArtworkService _service;
   private readonly JwtUtil _jwtUtil;
+  private readonly ILogger<ArtworkController> _logger;
 
-  public ArtworkController(ArtworkService service, JwtUtil jwtUtil)
+  public ArtworkController(ArtworkService service, JwtUtil jwtUtil, ILogger<ArtworkController> logger)
   {
     _service = service;
     _jwtUtil = jwtUtil;
+    _logger = logger;
   }
 
   [HttpGet]
@@ -40,6 +42,8 @@ public class ArtworkController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<Artwork>> Create([FromBody] Artwork artwork)
   {
+    _logger.LogInformation($"[POST] Creating artwork: {artwork.Title}");
+
     var authHeader = Request.Headers["Authorization"].FirstOrDefault();
 
     if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
@@ -54,7 +58,21 @@ public class ArtworkController : ControllerBase
       return Forbid("Invalid or expired token");
     }
 
-    var created = await _service.CreateArtworkAsync(artwork);
-    return Ok(new { message = $"Artwork {artwork.Title} successfully created" });
+    try
+    {
+      foreach (var link in artwork.Links)
+      {
+        link.ArtworkDate = artwork.Date;
+      }
+
+      var created = await _service.CreateArtworkAsync(artwork);
+      return Ok(new { message = $"Artwork {artwork.Title} successfully created" });
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError($"Error creating artwork: {ex.Message}");
+      _logger.LogError(ex.StackTrace);
+      return StatusCode(500, "Internal Server Error");
+    }
   }
 }

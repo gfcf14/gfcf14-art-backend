@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
       .HasOne(l => l.Artwork)
       .WithMany(a => a.Links)
       .HasForeignKey(l => l.ArtworkDate)
-      .HasPrincipalKey(a => a.Date);
+      .HasPrincipalKey(a => a.Date)
+      .OnDelete(DeleteBehavior.Cascade);
   }
 }
