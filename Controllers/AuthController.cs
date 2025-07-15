@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
     _jwtUtil = jwtUtil;
   }
 
-  [HttpPost("/login")]
+  [HttpPost("login")]
   public async Task<IActionResult> Login([FromBody] LoginRequest request)
   {
     var user = await _userService.GetByUsernameAsync(request.Username);
