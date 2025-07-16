@@ -16,11 +16,12 @@ public class ArtworkService
   public async Task<Artwork?> GetClosestOrEarliestAsync(string date)
   {
     var targetDate = DateTime.Parse(date);
+    var allArtworks = await _context.Artworks.Include(a => a.Links).ToListAsync();
 
-    var closest = await _context.Artworks
-      .Where(a => DateTime.Parse(a.Date) <= targetDate)
+    var closest = allArtworks
+      .Where(a => DateTime.TryParse(a.Date, out var d) && d <= targetDate)
       .OrderByDescending(a => DateTime.Parse(a.Date))
-      .FirstOrDefaultAsync();
+      .FirstOrDefault();
 
     if (closest != null)
     {
@@ -28,14 +29,16 @@ public class ArtworkService
     }
 
     // If there are no earlier or same date artworks, return earliest available
-    return await _context.Artworks
+    return allArtworks
+      .Where(a => DateTime.TryParse(a.Date, out _))
       .OrderBy(a => DateTime.Parse(a.Date))
-      .FirstOrDefaultAsync();
+      .FirstOrDefault();
   }
 
   public async Task<List<Artwork>> GetAllAsync()
   {
     return await _context.Artworks
+      .Include(a => a.Links)
       .OrderByDescending(a => a.Date)
       .ToListAsync();
   }
